@@ -1,11 +1,48 @@
 import React from 'react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../src/config';
+import axios from 'axios';
 
-const Login = () => {
+
+const Login = ({ setIsloggedIn }) => {
+  const [emailId,setEmailId]=useState("");
+  const [isAdmin,setIsAdmin]=useState(false);
+  const [password,setPassword]=useState("");
+  const navigate=useNavigate();
+
+  const handleLogin=async(e)=>{
+    e.preventDefault();
+    try{
+      let res;
+      if(isAdmin){
+          res=await axios.post(`${API_URL}/admin/login`,{
+          emailId,
+          password,
+          isAdmin
+          });
+      }else{
+            res=await axios.post(`${API_URL}/user/login`,{
+            emailId,
+            password
+          });
+      }
+      if(res.status===200){
+        setIsloggedIn(true);
+        navigate(isAdmin?'/admin-dashboard':'/user-dashboard');
+      }else{
+        console.error("user or admin login is not successfull");
+      }
+    }catch(err){
+      console.error(err.response?.data?.message || err.message);
+    }
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <div className="flex flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl w-full">
         
-        {/* Left Side Content */}
+        
         <div className="flex-1 p-8 flex flex-col justify-center">
           <h1 className="text-4xl font-bold mb-4">Login Now!</h1>
           <p className="text-gray-600">
@@ -14,24 +51,28 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Login Form */}
         <div className="flex-1 p-8 bg-gray-50">
           <form className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">EmailId</label>
               <input
                 type="email"
+                value={emailId}
+                onChange={(e)=>setEmailId(e.target.value)}
                 placeholder="Email"
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <input type="checkbox"/><label>Are you Admin?</label>
+              <input type="checkbox" onChange={(e)=>setIsAdmin(e.target.checked)}/><label>Are you Admin?</label>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
               <input
                 type="password"
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
                 placeholder="Password"
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
             </div>
             <div className="text-sm">
@@ -40,6 +81,7 @@ const Login = () => {
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+              onClick={handleLogin}
             >
               Login
             </button>

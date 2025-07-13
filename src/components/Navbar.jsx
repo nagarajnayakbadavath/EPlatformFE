@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
-const NavBar = () => {
-  const [isloggedIn,setIsloggedIn]=useState(false);
+const NavBar = ({ isloggedIn, setIsloggedIn }) => {
+  const handleLogout = () => {
+    setIsloggedIn(false);
+  };
 
   return (
     <nav className="bg-blue-600 text-white px-6 py-4">
@@ -11,7 +13,6 @@ const NavBar = () => {
         <div className="flex gap-4">
           {isloggedIn ? (
             <>
-              <Link to="/">Home</Link>
               <Link to="/courses">Courses</Link>
               <Link to="/my-learning">My Learning</Link>
               <Link to="/certificates">Certificates</Link>
