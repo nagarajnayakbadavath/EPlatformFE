@@ -20,21 +20,23 @@ const Login = ({ setIsloggedIn }) => {
           emailId,
           password,
           isAdmin
-          });
+          },{ withCredentials: true });
       }else{
             res=await axios.post(`${API_URL}/user/login`,{
             emailId,
             password
-          });
+          },{ withCredentials: true });
       }
-      if(res.status===200){
+      if(res.data.success){
         setIsloggedIn(true);
-        navigate(isAdmin?'/admin-dashboard':'/user-dashboard');
+        localStorage.setItem("isloggedIn", "true");
+      localStorage.setItem("role", res.data.role); // optional if you need role later
+      navigate(res.data.role === 'admin' ? '/adminDashboard' : '/userDashboard');
       }else{
         console.error("user or admin login is not successfull");
       }
     }catch(err){
-      console.error(err.response?.data?.message || err.message);
+      console.error(err.message);
     }
   }
 

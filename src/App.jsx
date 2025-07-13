@@ -10,8 +10,10 @@ import UserDashboard from './components/UserDashboard'
 import AdminDashboard from './components/AdminDashboard'
 
 function App() {
-  const [isloggedIn,setIsloggedIn]=useState(false);
-
+  const [isloggedIn, setIsloggedIn] = useState(() => {
+  return localStorage.getItem("isloggedIn") === "true";
+});
+  
   return (
     <div>
       <BrowserRouter basename="/"> 

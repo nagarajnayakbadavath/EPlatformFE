@@ -1,9 +1,26 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../config";
 
 const NavBar = ({ isloggedIn, setIsloggedIn }) => {
-  const handleLogout = () => {
-    setIsloggedIn(false);
+
+  const navigate=useNavigate();
+  const handleLogout = async() => {
+    try{
+        const res=await axios.post(`${API_URL}/logout`,{},{ withCredentials:true });
+        if(res.status===200){
+          setIsloggedIn(false);
+          localStorage.removeItem("isloggedIn");
+          localStorage.removeItem("role");
+          navigate("/"); //Home
+        }else{
+            setError("User or admin not loggedOut");
+        }
+    }catch(err){
+        console.error(err.message);
+    }
   };
 
   return (
@@ -13,11 +30,11 @@ const NavBar = ({ isloggedIn, setIsloggedIn }) => {
         <div className="flex gap-4">
           {isloggedIn ? (
             <>
-              <Link to="/courses">Courses</Link>
-              <Link to="/my-learning">My Learning</Link>
-              <Link to="/certificates">Certificates</Link>
-              <Link to="/profile">Profile</Link>
-              <button onClick={handleLogout}>Logout</button>
+              <Link to="/courses" className="hover:underline">Courses</Link>
+              <Link to="/my-learning" className="hover:underline">My Learning</Link>
+              <Link to="/certificates" className="hover:underline">Certificates</Link>
+              <Link to="/profile" className="hover:underline">Profile</Link>
+              <button onClick={handleLogout} className="hover:underline">Logout</button>
             </>
           ):(
             <>
