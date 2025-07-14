@@ -4,155 +4,212 @@ import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../src/config';
 
 const Signup = () => {
-    const [fullName,setFullName]=useState("");
-    const [emailId,setEmailId]=useState("");
-    const [password,setPassword]=useState("");
+  const [fullName, setFullName] = useState('');
+  const [emailId, setEmailId] = useState('');
+  const [password, setPassword] = useState('');
+  const [otp, setOTP] = useState('');
+  const [error, setError] = useState('');
 
-    const [showotpfield,setShowotpfield]=useState(false);
-    const [showVerifyField,setShowVerifyField]=useState(false);
-    const [showVerifybtn,setShowVerifybtn]=useState(false);
-    const [error,setError]=useState("");
-    const [otp,setOTP]=useState("");
-    const [isotpverified,setIsotpverified]=useState(false);
+  const [showOTPButton, setShowOTPButton] = useState(false);
+  const [showOTPField, setShowOTPField] = useState(false);
+  const [showVerifyButton, setShowVerifyButton] = useState(false);
+  const [isOTPVerified, setIsOTPVerified] = useState(false);
+  
+  const [fullNameError,setFullNameError]=useState('');
+  const [emailError,setEmailError]=useState('');
+  const [passwordError,setPaswordError]=useState('');
+  
+  const navigate = useNavigate();
 
-    const navigate=useNavigate();
-
-    const HandleShowOTPbtn=async(e)=>{
-      setEmailId(e.target.value);
-        setShowotpfield(true);
+  const handleGetOTP = async () => {
+    try {
+      const res = await axios.post(`${API_URL}/send-otp`, { emailId });
+      if (res.status === 200) {
+        setShowOTPField(true);
+        alert(`An OTP has been sent to ${emailId}`);
+      } else {
+        alert("Failed to send OTP. Please try again.");
+      }
+    } catch (err) {
+      console.error(err.message);
+      alert("Error occurred while sending OTP.");
     }
+  };
 
-    const handleGetOTP=async()=>{
-      try{
-        const res=await axios.post(`${API_URL}/send-otp`,{emailId});
-        if(res.status===200){
-            setShowVerifyField(true);
-            alert(`an otp is send to your ${emailId}`);
-        }else{
-            setShowVerifyField(false);
-            alert("otp is not send to your mail");
-        }
-      }catch(err){
+  const verifyOTP = async () => {
+    try {
+      const res = await axios.post(`${API_URL}/verify-otp`, { emailId, otp });
+      if (res.status === 200) {
+        alert("OTP verified successfully!");
+        setIsOTPVerified(true);
+        setShowOTPField(false);
+        setShowVerifyButton(false);
+        setShowOTPButton(false);
+      } else {
+        alert("Invalid OTP. Please try again.");
+      }
+    } catch (err) {
+      console.error(err.message);
+      alert("OTP verification failed.");
+    }
+  };
+
+  const validateForm = (fullName, email, password) => {
+  let fullNameError = '';
+  let emailError = '';
+  let passwordError = '';
+
+  // Full Name Validation
+  if (fullName.length <= 6) {
+    fullNameError = 'Full name must be longer than 6 characters.';
+  }
+
+  // Email Validation
+  const emailPattern = /^[a-z]+@gmail\.com$/;
+  if (!emailPattern.test(email)) {
+    emailError = 'Email must be in the format: lowercaseletters@gmail.com';
+  }
+
+  // Password Validation
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  if (!passwordPattern.test(password)) {
+    passwordError = 'Password must contain uppercase, lowercase, number, symbol, and be at least 8 characters long.';
+  }
+
+  setFullNameError(fullNameError);
+  setEmailError(emailError);
+  setPaswordError(passwordError);
+
+  return !fullNameError && !emailError && !passwordError;
+};
+
+
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+    if (!isOTPVerified) {
+      alert("Please verify the OTP before registering.");
+      return;
+    }
+    const isValid = validateForm(fullName, emailId, password);
+    if(!isValid) return;
+    try {
+      const res = await axios.post(`${API_URL}/user/register`, {
+        fullName,
+        emailId,
+        password,
+      });
+      if (res.status===200) {
+        navigate('/login');
+      }else{
+        setError("Registration failed. Please try again.");
+      }
+    } catch (err) {
+      if (err.response?.status === 409) {
+        setError(err.response.data.message);
+      }else{
         console.error(err.message);
-        alert("Error occured while sending an otp");
+        setError("Something went wrong. Please try again.");
       }
     }
+  };
 
-    const verifyOTP=async()=>{
-      try{
-          const res=await axios.post(`${API_URL}/verify-otp`,{
-            emailId,otp
-          });
-          if(res.status===200){
-            alert("otp is verified Thank you!");
-            setIsotpverified(true);
-            //HandleRegistration();
-          }else{
-            alert("you entered a wrong otp.I guess");
-          }
-          //after verifyting the otp disable the verify field and working or get otp button and also verify button
-          setShowVerifyField(false);
-          setShowVerifybtn(false);
-          setShowotpfield(false);
-      }catch(err){
-        console.error(err.message);
-        alert("verification of otp is failed");
-      }
-    }
-
-    const handleOTP=(e)=>{
-        setShowVerifybtn(true);
-    }
-
-    const HandleRegistration=async(e)=>{
-      e.preventDefault();
-      if(!isotpverified){
-        alert("verify the otp first");
-        return;
-      }
-        try{
-            const res=await axios.post(`${API_URL}/user/register`,{
-                fullName,
-                emailId,
-                password
-            });
-            if(res.status===200){
-              navigate("/login");
-            }else{
-              setError("Registration failed");
-            }
-        }catch(err){
-            console.error(err.message);
-        }
-    }
-    
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
       <div className="flex flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden max-w-4xl w-full">
-        
         <div className="flex-1 p-8 flex flex-col justify-center">
           <h1 className="text-4xl font-bold mb-4">Signup Now!</h1>
           <p className="text-gray-600">
             Join our platform to access high-quality courses, study materials, and interactive learning experiences.
             Whether you're looking to upgrade your skills or explore new topics, LearnSphere helps you learn at your own pace with expert guidance.
-            Register today and start your learning journey with us
+            Register today and start your learning journey with us.
           </p>
         </div>
 
         <div className="flex-1 p-8 bg-gray-50">
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleRegistration}>
             <div>
-                <label className="block text-sm font-medium mb-1">fullName</label>
+              {fullNameError}<label className="block text-sm font-medium mb-1">Full Name</label>
               <input
                 type="text"
                 value={fullName}
-                placeholder="fullName"
-                onChange={(e)=>setFullName(e.target.value)}
+                placeholder="Full Name"
+                onChange={(e) => setFullName(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
-              <label className="block text-sm font-medium mb-1">Email</label>
+              {fullNameError && (
+  <p className="text-red-500 text-sm mt-1">{fullNameError}</p>)}
+              <label className="block text-sm font-medium mb-1 mt-4">Email</label>
               <input
-                type="text"
+                type="email"
                 value={emailId}
                 placeholder="Email"
+                onChange={(e) => {
+                  setEmailId(e.target.value);
+                  setShowOTPButton(true);
+                }}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onChange={HandleShowOTPbtn}
+                required
               />
-              {showotpfield && (
-                <button type="button"
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition" onClick={handleGetOTP}>
-                  GET OTP
+              {emailError && (
+  <p className="text-red-500 text-sm mt-1">{emailError}</p>)}
+              {showOTPButton && !isOTPVerified && (
+                <button
+                  type="button"
+                  className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                  onClick={handleGetOTP}
+                >
+                  Get OTP
                 </button>
               )}
             </div>
-            {showVerifyField && (
-                <input type="text" value={otp} placeholder="enter the otp to verify" className="w-full px-4 py-2 border rounded-md"
-                onChange={(e) => {
-            if (e.target.value.trim().length > 0) {
-                setOTP()
-                setShowVerifybtn(true);
-            } else {
-                setShowVerifybtn(false);
-            }}}
-            />
+
+            {showOTPField && !isOTPVerified && (
+              <div>
+                <label className="block text-sm font-medium mb-1 mt-4">Enter OTP</label>
+                <input
+                  type="text"
+                  value={otp}
+                  placeholder="Enter OTP"
+                  onChange={(e) => {
+                    setOTP(e.target.value);
+                    setShowVerifyButton(e.target.value.trim().length > 0);
+                  }}
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             )}
-            {showVerifybtn && (
-                <button type="button" onClick={verifyOTP} className="">
-                    Verify OTP
-                </button>
+
+            {showVerifyButton && !isOTPVerified && (
+              <button
+                type="button"
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+                onClick={verifyOTP}
+              >
+                Verify OTP
+              </button>
             )}
+
             <div>
-              <label className="block text-sm font-medium mb-1">Create Password</label>
+              <label className="block text-sm font-medium mb-1 mt-4">Create Password</label>
               <input
                 type="password"
                 value={password}
                 placeholder="Password"
-                onChange={(e)=>setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
+              {passwordError && (
+  <p className="text-red-500 text-sm mt-1">{passwordError}</p>)}
             </div>
+
+            {error && <p className="text-red-600">{error}</p>}
+
             <button
-              type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition" onClick={HandleRegistration}>
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition mt-4"
+            >
               Register
             </button>
           </form>

@@ -9,10 +9,12 @@ const Login = ({ setIsloggedIn }) => {
   const [emailId,setEmailId]=useState("");
   const [isAdmin,setIsAdmin]=useState(false);
   const [password,setPassword]=useState("");
+  const [error,setError]=useState("");
   const navigate=useNavigate();
 
   const handleLogin=async(e)=>{
     e.preventDefault();
+    setError('');
     try{
       let res;
       if(isAdmin){
@@ -30,13 +32,15 @@ const Login = ({ setIsloggedIn }) => {
       if(res.data.success){
         setIsloggedIn(true);
         localStorage.setItem("isloggedIn", "true");
-      localStorage.setItem("role", res.data.role); // optional if you need role later
+        localStorage.setItem("role", res.data.role); // optional if you need role later
       navigate(res.data.role === 'admin' ? '/adminDashboard' : '/userDashboard');
       }else{
+        setError("Invalid Mail or Password!");
         console.error("user or admin login is not successfull");
       }
     }catch(err){
       console.error(err.message);
+      setError(err.message);
     }
   }
 
@@ -56,6 +60,8 @@ const Login = ({ setIsloggedIn }) => {
         <div className="flex-1 p-8 bg-gray-50">
           <form className="space-y-4">
             <div>
+              {error && (
+  <p className="text-red-500 text-sm mt-1">{error}</p>)}
               <label className="block text-sm font-medium mb-1">EmailId</label>
               <input
                 type="email"
@@ -64,7 +70,7 @@ const Login = ({ setIsloggedIn }) => {
                 placeholder="Email"
                 className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <input type="checkbox" onChange={(e)=>setIsAdmin(e.target.checked)}/><label>Are you Admin?</label>
+              <input type="checkbox" checked={isAdmin} onChange={(e)=>setIsAdmin(e.target.checked)}/><label>Are you Admin?</label>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Password</label>
