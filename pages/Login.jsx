@@ -33,6 +33,8 @@ const Login = ({ setIsloggedIn }) => {
         setIsloggedIn(true);
         localStorage.setItem("isloggedIn", "true");
         localStorage.setItem("role", res.data.role); // optional if you need role later
+        localStorage.setItem("_id",res.data.user._id);
+        localStorage.setItem("token",res.data.token);
       navigate(res.data.role === 'admin' ? '/adminDashboard' : '/userDashboard');
       }else{
         setError("Invalid Mail or Password!");
@@ -84,7 +86,7 @@ const Login = ({ setIsloggedIn }) => {
               />
             </div>
             <div className="text-sm">
-              <a href="#" className="text-blue-600 hover:underline">Forgot password?</a>
+              {/* <a href="#" className="text-blue-600 hover:underline">Forgot password?</a> */}
             </div>
             <button
               type="submit"

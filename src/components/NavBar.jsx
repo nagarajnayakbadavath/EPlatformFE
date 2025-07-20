@@ -37,17 +37,16 @@ const NavBar = ({ isloggedIn, setIsloggedIn }) => {
             <>
               {role === "admin" ? (
                 <>
-                  <Link to="/adminDashboard" className="hover:underline">Admins</Link>
-                  <Link to="/adminDashboard" className="hover:underline">Enrolled Students</Link>
-                  <Link to="/manageCourses" className="hover:underline">Upload PDF</Link>
-                  <Link to="/manageCourses" className="hover:underline">Upload New Courses</Link>
-                  <Link to="/manageCourses" className="hover:underline">Remove Courses</Link>
+                  <Link to="/enrolledStudents" className="hover:underline">Enrolled Students</Link>
+                  <Link to="/uploadPDF" className="hover:underline">Upload PDF</Link>
+                  <Link to="/uploadVideo" className="hover:underline">Upload New Courses</Link>
+                  <Link to="/removeCourses" className="hover:underline">Remove Courses</Link>
+                  <Link to="/removepdf" className="hover:underline">Remove PDF</Link>
                 </>
               ) : role === "user" ? (
                 <>
                   <Link to="/courses" className="hover:underline">Courses</Link>
-                  <Link to="/mylearnings" className="hover:underline">My Learning</Link>
-                  <Link to="/certificates" className="hover:underline">Certificates</Link>
+                  <Link to="/viewpdf" className="hover:underline">PDF</Link>
                   <Link to="/profile" className="hover:underline">Profile</Link>
                 </>
               ) : null}

@@ -10,10 +10,14 @@ import UserDashboard from './components/UserDashboard'
 import AdminDashboard from './components/AdminDashboard'
 import Courses from './components/Courses'
 import Certificates from './components/Certificates'
-import MyLearnings from './components/MyLearnings'
 import Profile from './components/Profile'
 import AboutUs from '../pages/AboutUs'
-
+import EnrolledStudents from './components/EnrolledStudents'
+import UploadPDF from './components/UploadPDF'
+import UploadNewCourses from './components/UploadNewCourses'
+import RemoveCourses from './components/RemoveCourses'
+import ViewPdfs from './ViewPdfs'
+import RemovePDF from './components/RemovePDF'
 
 function App() {
   const [isloggedIn, setIsloggedIn] = useState(() => {
@@ -32,9 +36,14 @@ function App() {
         <Route path="/login" element={<Login setIsloggedIn={setIsloggedIn}/>}/>
         <Route path="/userDashboard" element={<UserDashboard/>}/>
         <Route path="/adminDashboard" element={<AdminDashboard/>}/>
+        <Route path="/uploadPDF" element={<UploadPDF/>}/>
+        <Route path="/uploadVideo" element={<UploadNewCourses/>}/>
+        <Route path="/removeCourses" element={<RemoveCourses/>}/>
+        <Route path="/enrolledStudents" element={<EnrolledStudents/>}/>
         <Route path="/courses" element={<Courses/>}/>
         <Route path="/certificates" element={<Certificates/>}/>
-        <Route path="/mylearnings" element={<MyLearnings/>}/>
+        <Route path="/viewpdf" element={<ViewPdfs/>}/>
+        <Route path="/removepdf" element={<RemovePDF/>}/>
         <Route path="/profile" element={<Profile/>}/>
         </Route>
       </Routes>
