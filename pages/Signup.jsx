@@ -64,17 +64,8 @@ const Signup = () => {
     fullNameError = 'Full name must be longer than 6 characters.';
   }
 
-  // Email Validation
-  const emailPattern = /^[a-z]+@gmail\.com$/;
-  if (!emailPattern.test(email)) {
-    emailError = 'Email must be in the format: lowercaseletters@gmail.com';
-  }
 
-  // Password Validation
-  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-  if (!passwordPattern.test(password)) {
-    passwordError = 'Password must contain uppercase, lowercase, number, symbol, and be at least 8 characters long.';
-  }
+  
 
   setFullNameError(fullNameError);
   setEmailError(emailError);
